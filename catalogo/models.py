@@ -65,7 +65,17 @@ class Libro(models.Model):
     autor             = models.ForeignKey(Autor, on_delete=models.PROTECT, related_name='libros')
     categorias        = models.ManyToManyField(Categoria, blank=True)
 
-
-
     pass
 
+class Prestamo(models.Model):
+    """
+    Registro de un préstamo de libro a un usuario.
+    Si fecha_devolucion es NULL → el préstamo está activo.
+    """
+    libro              = models.ForeignKey(Libro, on_delete=models.CASCADE, related_name='prestamos')
+    nombre_prestatario = models.CharField(max_length=100)
+    fecha_prestamo     = models.DateField(default=timezone.now)
+    fecha_devolucion   = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.libro.titulo} → {self.nombre_prestatario}"
