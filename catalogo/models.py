@@ -9,6 +9,9 @@ class Autor(models.Model):
     Representa a un autor/a.
     Requerido: nombre, email único, biografía opcional.
     """
+    nombre = models.CharField(max_length=15)
+    email = models.EmailField(unique=True)
+    biografia= models.TextField(blank=True)
 
     # TODO: implementar los campos del modelo
     # Ejemplo de campo:
@@ -20,10 +23,8 @@ class Autor(models.Model):
 
     pass
 
-    # Opcional: definir __str__ para que sea legible en el admin y en el shell
-    # def __str__(self) -> str:
-    #     return self.nombre
-
+    def __str__(self):
+        return self.nombre
 
 class Categoria(models.Model):
     """
@@ -32,11 +33,11 @@ class Categoria(models.Model):
     """
 
     # TODO: implementar el campo nombre (unique=True)
-
+    nombre= models.CharField(max_length=20,unique=True)
     pass
 
-    # def __str__(self) -> str:
-    #     return self.nombre
+    def __str__(self) -> str:
+        return self.nombre
 
 
 class Libro(models.Model):
