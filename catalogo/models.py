@@ -21,10 +21,12 @@ class Autor(models.Model):
     # email    → EmailField (unique=True)
     # biografia → TextField (blank=True para hacerlo opcional)
 
-    pass
+    
 
     def __str__(self):
         return self.nombre
+    
+    pass
 
 class Categoria(models.Model):
     """
@@ -34,11 +36,11 @@ class Categoria(models.Model):
 
     # TODO: implementar el campo nombre (unique=True)
     nombre= models.CharField(max_length=20,unique=True)
-    pass
+    
 
     def __str__(self) -> str:
         return self.nombre
-
+    pass
 
 class Libro(models.Model):
     """
@@ -59,13 +61,37 @@ class Libro(models.Model):
     # ¿Por qué isbn debe ser único?
 
     titulo            = models.CharField(max_length=200)
-    isbn              = models.CharField(max_length=13, unique=True)
+    isbn              = models.CharField(max_length=30, unique=True)
     fecha_publicacion = models.DateField()
     cantidad_total    = models.PositiveIntegerField()
     autor             = models.ForeignKey(Autor, on_delete=models.PROTECT, related_name='libros')
     categorias        = models.ManyToManyField(Categoria, blank=True)
 
+    def __str__(self):
+        return f"{self.titulo} ({self.isbn})"
+
+    def prestamos_activos(self) -> int:
+        return self.prestamos.filter(fecha_devolucion__isnull=True).count()
+
+    def disponibles(self) -> int:
+        return self.cantidad_total - self.prestamos_activos()
+
+    def tiene_disponibles(self) -> bool:
+        return self.disponibles() > 0
 
 
     pass
 
+class Prestamo(models.Model):
+    """
+    Registro de un préstamo de libro a un usuario.
+    Si fecha_devolucion es NULL → el préstamo está activo.
+    """
+    libro              = models.ForeignKey(Libro, on_delete=models.CASCADE, related_name='prestamos')
+    nombre_prestatario = models.CharField(max_length=100)
+    fecha_prestamo     = models.DateField(default=timezone.now)
+    fecha_devolucion   = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.libro.titulo} → {self.nombre_prestatario}"
+    pass
