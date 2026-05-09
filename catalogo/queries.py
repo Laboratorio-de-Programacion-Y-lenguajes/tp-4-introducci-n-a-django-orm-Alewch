@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from django.db.models import Count, Q
+from django.db.models import Count, Q, F
 
 from .models import Autor, Libro
-from models import models
+from django.db import models
 
 def libros_por_categoria(nombre_categoria: str):
     """
@@ -23,8 +23,8 @@ def libros_por_categoria(nombre_categoria: str):
     # TODO: implementar la consulta ORM
     # Pista: usá filter con la relación M2M
     #   Libro.objects.filter(categorias__nombre=nombre_categoria)
-    libros=Libro.objects.filter(categorias__nombre=nombre_categoria)
-    return libros
+    libross=Libro.objects.filter(categorias__nombre=nombre_categoria)
+    return libross
     
 
 
@@ -47,7 +47,7 @@ def autores_con_mas_de_n_libros(n: int):
     #   Autor.objects.annotate(cantidad_libros=Count("libro"))
     # Pista 2: luego filtrá
     #   .filter(cantidad_libros__gt=n)
-    return Autor.objects.annotate(cantidad_libros=Count("libro")).filter(cantidad_libros__gt=n)
+    return Autor.objects.annotate(cantidad_libros=Count("libros")).filter(cantidad_libros__gt=n)
 
 
 
@@ -69,8 +69,8 @@ def libros_sin_disponibilidad():
     """
     # TODO: implementar con annotate + F expression + filter
     return Libro.objects.annotate(
-        activos=Count("prestamo", filter=Q(prestamo__fecha_devolucion__isnull=True))
-    ).filter(activos=models.F("cantidad_total"))
+        activos=Count("prestamos", filter=Q(prestamos__fecha_devolucion__isnull=True))
+    ).filter(activos=F("cantidad_total"))
    
 
 
@@ -89,6 +89,6 @@ def top_n_libros_mas_prestados(n: int):
                      .order_by("-total_prestamos")[:n]
     """
     # TODO: implementar con annotate + order_by + slicing
-    libro=Libro.objects.annotate(
-        total_prestamos=Count("prestamo")).order_by("-total_prestamos")[:n]
-
+    librosss=Libro.objects.annotate(
+        total_prestamos=Count("prestamos")).order_by("-total_prestamos")[:n]
+    return librosss
