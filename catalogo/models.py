@@ -79,7 +79,6 @@ class Libro(models.Model):
     def tiene_disponibles(self) -> bool:
         return self.disponibles() > 0
 
-
     pass
 
 class Prestamo(models.Model):
