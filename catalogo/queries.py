@@ -49,3 +49,46 @@ def autores_con_mas_de_n_libros(n: int):
     #   .filter(cantidad_libros__gt=n)
     return Autor.objects.annotate(cantidad_libros=Count("libro")).filter(cantidad_libros__gt=n)
 
+
+
+def libros_sin_disponibilidad():
+    """
+    Devuelve un QuerySet de Libros donde no hay copias disponibles.
+    (prestamos_activos == cantidad_total)
+
+    Returns:
+        QuerySet[Libro]
+
+    Restricción: resolver con ORM, SIN iterar libros en Python
+    (no usar disponibles() en un loop).
+
+    Pista: podés contar los préstamos activos por libro con annotate:
+        Libro.objects.annotate(
+            activos=Count("prestamo", filter=Q(prestamo__fecha_devolucion__isnull=True))
+        ).filter(activos=models.F("cantidad_total"))
+    """
+    # TODO: implementar con annotate + F expression + filter
+    return Libro.objects.annotate(
+        activos=Count("prestamo", filter=Q(prestamo__fecha_devolucion__isnull=True))
+    ).filter(activos=models.F("cantidad_total"))
+   
+
+
+def top_n_libros_mas_prestados(n: int):
+    """
+    Devuelve los N libros con más préstamos (en total, sin importar si están activos).
+
+    Args:
+        n: cantidad de libros a retornar
+
+    Returns:
+        QuerySet[Libro] con hasta n elementos, ordenados de más a menos prestados.
+
+    Pista:
+        Libro.objects.annotate(total_prestamos=Count("prestamo"))
+                     .order_by("-total_prestamos")[:n]
+    """
+    # TODO: implementar con annotate + order_by + slicing
+    libro=Libro.objects.annotate(
+        total_prestamos=Count("prestamo")).order_by("-total_prestamos")[:n]
+
